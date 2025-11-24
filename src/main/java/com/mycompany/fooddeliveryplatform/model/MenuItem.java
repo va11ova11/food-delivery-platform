@@ -27,6 +27,7 @@ public class MenuItem {
     private Restaurant restaurant;
 
     private String name;
+    private String description;
 
     @Column(nullable = false)
     private BigDecimal price;

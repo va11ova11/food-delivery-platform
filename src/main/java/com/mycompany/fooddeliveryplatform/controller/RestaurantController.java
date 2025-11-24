@@ -1,6 +1,11 @@
 package com.mycompany.fooddeliveryplatform.controller;
 
+import com.mycompany.fooddeliveryplatform.dto.menuItem.MenuItemRequestDto;
+import com.mycompany.fooddeliveryplatform.dto.menuItem.MenuItemResponseDto;
+import com.mycompany.fooddeliveryplatform.dto.restaurant.RestaurantRequestDto;
+import com.mycompany.fooddeliveryplatform.dto.restaurant.RestaurantResponseDto;
 import com.mycompany.fooddeliveryplatform.service.RestaurantService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import com.mycompany.fooddeliveryplatform.model.MenuItem;
 import com.mycompany.fooddeliveryplatform.model.Restaurant;
@@ -15,34 +20,34 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
 
     @GetMapping
-    public List<Restaurant> getRestaurants() {
+    public List<RestaurantResponseDto> getRestaurants() {
         return restaurantService.getRestaurants();
     }
 
     @GetMapping("{restaurantId}")
-    public Restaurant getRestaurant(@PathVariable Long restaurantId) {
+    public RestaurantResponseDto getRestaurant(@PathVariable Long restaurantId) {
         return restaurantService.getRestaurant(restaurantId);
     }
 
     @PostMapping
-    public Restaurant createRestaurant(@RequestBody Restaurant restaurant){
-        return restaurantService.createRestaurant(restaurant);
+    public RestaurantResponseDto createRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto){
+        return restaurantService.createRestaurant(restaurantRequestDto);
     }
 
     @PutMapping("/{restaurantId}")
-    public Restaurant updateRestaurant(@PathVariable Long restaurantId, @RequestBody Restaurant restaurant){
-        return restaurantService.updateRestaurant(restaurantId, restaurant);
+    public RestaurantResponseDto updateRestaurant(@PathVariable Long restaurantId, @Valid @RequestBody RestaurantRequestDto restaurantRequestDto){
+        return restaurantService.updateRestaurant(restaurantId, restaurantRequestDto);
     }
 
     @GetMapping("/{restaurantId}/menu")
-    public List<MenuItem> getMenu(@PathVariable Long restaurantId) {
+    public List<MenuItemResponseDto> getMenu(@PathVariable Long restaurantId) {
         return restaurantService.getMenu(restaurantId);
     }
 
 
     @PostMapping("/{restaurantId}/menu")
-    public MenuItem addMenuItem(@PathVariable Long restaurantId, @RequestBody MenuItem menuItem) {
-        return restaurantService.addMenuItem(restaurantId, menuItem);
+    public MenuItemResponseDto addMenuItem(@PathVariable Long restaurantId, @Valid @RequestBody MenuItemRequestDto menuItemRequestDto) {
+        return restaurantService.addMenuItem(restaurantId, menuItemRequestDto);
     }
 
     @DeleteMapping("{restaurantId}")
