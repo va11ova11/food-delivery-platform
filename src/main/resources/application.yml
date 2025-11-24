@@ -15,3 +15,7 @@ spring:
 
   flyway:
     enabled: false
+
+
+jwt:
+  expiration: 3600000
