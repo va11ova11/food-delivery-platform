@@ -1,11 +1,13 @@
 package com.mycompany.fooddeliveryplatform.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mycompany.fooddeliveryplatform.exception.ErrorResponse;
 import com.mycompany.fooddeliveryplatform.security.JwtAuthenticationFilter;
 import com.mycompany.fooddeliveryplatform.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,19 +41,38 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .userDetailsService(userService)
                 .authorizeHttpRequests(auth -> auth
-                        // auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
-
-                        // публичные GET’ы
                         .requestMatchers(HttpMethod.GET, "/api/restaurants").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/restaurants/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/restaurants/*/menu").permitAll()
-
-                        // изменения ресторанов — только ADMIN
                         .requestMatchers("/api/restaurants/**").hasRole("ADMIN")
-
-                        // остальное — только аутентифицированные
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        // 401 — когда пользователь не аутентифицирован
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            ErrorResponse body = new ErrorResponse(
+                                    java.time.Instant.now(),
+                                    HttpStatus.UNAUTHORIZED.value(),
+                                    "Authentication required",
+                                    request.getRequestURI()
+                            );
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType("application/json");
+                            new ObjectMapper().writeValue(response.getOutputStream(), body);
+                        })
+                        // 403 — когда аутентифицирован, но нет прав
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            ErrorResponse body = new ErrorResponse(
+                                    java.time.Instant.now(),
+                                    HttpStatus.FORBIDDEN.value(),
+                                    "Access denied",
+                                    request.getRequestURI()
+                            );
+                            response.setStatus(HttpStatus.FORBIDDEN.value());
+                            response.setContentType("application/json");
+                            new ObjectMapper().writeValue(response.getOutputStream(), body);
+                        })
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
