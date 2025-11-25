@@ -9,7 +9,7 @@ public class ErrorResponse {
     private int status;
     private String error;
     private String path;
-    private Map<String, String> fieldErrors; // можно null
+    private Map<String, String> fieldErrors;
 
     public ErrorResponse(Instant timestamp, int status, String error, String path) {
         this(timestamp, status, error, path, null);
