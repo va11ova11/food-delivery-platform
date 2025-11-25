@@ -8,14 +8,13 @@ import com.mycompany.fooddeliveryplatform.security.JwtService;
 import com.mycompany.fooddeliveryplatform.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -44,5 +43,13 @@ public class AuthController {
         String token = jwtService.generateToken(user);
 
         return new JwtResponse(token);
+    }
+
+    @GetMapping("/api/auth/me")
+    public Map<String, Object> me(org.springframework.security.core.Authentication authentication) {
+        Map<String, Object> result = new java.util.HashMap<>();
+        result.put("name", authentication.getName());
+        result.put("authorities", authentication.getAuthorities());
+        return result;
     }
 }

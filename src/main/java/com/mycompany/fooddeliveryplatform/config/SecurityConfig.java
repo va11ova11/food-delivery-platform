@@ -35,21 +35,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtAuthenticationFilter jwtAuthenticationFilter,
-                                                   UserService userService) throws Exception {
+                                                   UserService userService,
+                                                   ObjectMapper objectMapper) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .userDetailsService(userService)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/restaurants").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/restaurants/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/restaurants/*/menu").permitAll()
+
                         .requestMatchers("/api/restaurants/**").hasRole("ADMIN")
+                        .requestMatchers("/api/orders/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
-                        // 401 — когда пользователь не аутентифицирован
                         .authenticationEntryPoint((request, response, authException) -> {
                             ErrorResponse body = new ErrorResponse(
                                     java.time.Instant.now(),
@@ -59,9 +62,8 @@ public class SecurityConfig {
                             );
                             response.setStatus(HttpStatus.UNAUTHORIZED.value());
                             response.setContentType("application/json");
-                            new ObjectMapper().writeValue(response.getOutputStream(), body);
+                            objectMapper.writeValue(response.getOutputStream(), body); // ← используем бин
                         })
-                        // 403 — когда аутентифицирован, но нет прав
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             ErrorResponse body = new ErrorResponse(
                                     java.time.Instant.now(),
@@ -71,7 +73,7 @@ public class SecurityConfig {
                             );
                             response.setStatus(HttpStatus.FORBIDDEN.value());
                             response.setContentType("application/json");
-                            new ObjectMapper().writeValue(response.getOutputStream(), body);
+                            objectMapper.writeValue(response.getOutputStream(), body); // ← и тут
                         })
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

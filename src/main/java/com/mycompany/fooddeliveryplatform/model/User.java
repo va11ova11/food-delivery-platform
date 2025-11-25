@@ -2,6 +2,9 @@ package com.mycompany.fooddeliveryplatform.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -15,11 +18,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
+
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    private String password; //хэш
+    private String password;
 
     @Column(nullable = false)
     private String fullName;
