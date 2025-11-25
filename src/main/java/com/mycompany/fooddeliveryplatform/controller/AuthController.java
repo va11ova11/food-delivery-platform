@@ -44,12 +44,4 @@ public class AuthController {
 
         return new JwtResponse(token);
     }
-
-    @GetMapping("/api/auth/me")
-    public Map<String, Object> me(org.springframework.security.core.Authentication authentication) {
-        Map<String, Object> result = new java.util.HashMap<>();
-        result.put("name", authentication.getName());
-        result.put("authorities", authentication.getAuthorities());
-        return result;
-    }
 }

@@ -4,6 +4,8 @@ import com.mycompany.fooddeliveryplatform.dto.order.CreateOrderRequestDto;
 import com.mycompany.fooddeliveryplatform.dto.order.OrderItemRequestDto;
 import com.mycompany.fooddeliveryplatform.dto.order.OrderItemShortDto;
 import com.mycompany.fooddeliveryplatform.dto.order.OrderResponseDto;
+import com.mycompany.fooddeliveryplatform.exception.OrderValidationException;
+import com.mycompany.fooddeliveryplatform.exception.ResourceNotFoundException;
 import com.mycompany.fooddeliveryplatform.model.*;
 import com.mycompany.fooddeliveryplatform.repository.MenuItemRepository;
 import com.mycompany.fooddeliveryplatform.repository.OrderRepository;
@@ -13,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -28,15 +30,16 @@ public class OrderService {
     private final MenuItemRepository menuItemRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public OrderResponseDto createOrder(CreateOrderRequestDto request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
         User customer = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
         Restaurant restaurant = restaurantRepository.findById(request.restaurantId())
-                .orElseThrow(() -> new IllegalArgumentException("Restaurant not found: " + request.restaurantId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found: " + request.restaurantId()));
 
         Order order = new Order();
         order.setCustomer(customer);
@@ -50,11 +53,10 @@ public class OrderService {
 
         for (OrderItemRequestDto itemReq : request.items()) {
             MenuItem menuItem = menuItemRepository.findById(itemReq.menuItemId())
-                    .orElseThrow(() -> new IllegalArgumentException("Menu item not found: " + itemReq.menuItemId()));
-
+                    .orElseThrow(() -> new ResourceNotFoundException("Menu item not found: " + itemReq.menuItemId()));
 
             if (!menuItem.getRestaurant().getId().equals(request.restaurantId())) {
-                throw new IllegalArgumentException(
+                throw new OrderValidationException(
                         "Menu item " + itemReq.menuItemId() +
                                 " does not belong to restaurant " + request.restaurantId()
                 );
@@ -68,8 +70,9 @@ public class OrderService {
 
             orderItems.add(orderItem);
 
-            total = total.add(menuItem.getPrice()
-                    .multiply(BigDecimal.valueOf(itemReq.quantity())));
+            total = total.add(
+                    menuItem.getPrice().multiply(BigDecimal.valueOf(itemReq.quantity()))
+            );
         }
 
         order.setItems(orderItems);
@@ -80,12 +83,13 @@ public class OrderService {
         return toDto(saved);
     }
 
+    @Transactional(readOnly=true)
     public List<OrderResponseDto> getMyOrders() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
 
         User customer = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
         return orderRepository.findByCustomerId(customer.getId())
                 .stream()
