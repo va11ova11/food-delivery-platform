@@ -7,8 +7,6 @@ import com.mycompany.fooddeliveryplatform.dto.restaurant.RestaurantResponseDto;
 import com.mycompany.fooddeliveryplatform.service.RestaurantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import com.mycompany.fooddeliveryplatform.model.MenuItem;
-import com.mycompany.fooddeliveryplatform.model.Restaurant;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

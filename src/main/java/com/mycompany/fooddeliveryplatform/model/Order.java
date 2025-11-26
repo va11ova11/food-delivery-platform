@@ -1,6 +1,7 @@
 package com.mycompany.fooddeliveryplatform.model;
 
 
+import com.mycompany.fooddeliveryplatform.model.restaurant.Restaurant;
 import jakarta.persistence.*;
 import lombok.*;
 
