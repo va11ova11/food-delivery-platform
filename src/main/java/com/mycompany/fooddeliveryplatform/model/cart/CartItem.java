@@ -1,33 +1,32 @@
-package com.mycompany.fooddeliveryplatform.model;
+package com.mycompany.fooddeliveryplatform.model.cart;
+
 import com.mycompany.fooddeliveryplatform.model.restaurant.MenuItem;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 @Entity
-@Table(name = "order_items")
+@Table(name = "cart_items")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderItem {
+public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // к какой корзине относится
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    @JoinColumn(name = "cart_id", nullable = false)
+    private Cart cart;
 
+    // какое блюдо
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_item_id", nullable = false)
     private MenuItem menuItem;
 
     @Column(nullable = false)
     private int quantity;
-
-    @Column(nullable = false)
-    private BigDecimal price;
 }

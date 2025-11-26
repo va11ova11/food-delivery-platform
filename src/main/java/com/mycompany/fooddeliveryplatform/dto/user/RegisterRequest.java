@@ -15,6 +15,10 @@ public record RegisterRequest(
         String password,
 
         @NotBlank
+        @Size(max = 100)
+        String address,
+
+        @NotBlank
         @Size(max = 255)
         String fullName
 ) {}

@@ -1,6 +1,6 @@
 package com.mycompany.fooddeliveryplatform.controller;
 
-import com.mycompany.fooddeliveryplatform.dto.order.CreateOrderRequestDto;
+import com.mycompany.fooddeliveryplatform.dto.CreateOrderFromCartRequestDto;
 import com.mycompany.fooddeliveryplatform.dto.order.OrderResponseDto;
 import com.mycompany.fooddeliveryplatform.service.OrderService;
 import jakarta.validation.Valid;
@@ -16,11 +16,13 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    // оформить заказ (нужен JWT)
-    @PostMapping
-    public OrderResponseDto createOrder(@Valid @RequestBody CreateOrderRequestDto request) {
-        return orderService.createOrder(request);
+
+    @PostMapping("/from-cart")
+    public OrderResponseDto createOrderFromCart() {
+        return orderService.createOrderFromCart();
     }
+
+
 
     @GetMapping("/my")
     public List<OrderResponseDto> getMyOrders() {

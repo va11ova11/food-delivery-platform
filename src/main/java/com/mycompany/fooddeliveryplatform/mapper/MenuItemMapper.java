@@ -2,8 +2,8 @@ package com.mycompany.fooddeliveryplatform.mapper;
 
 import com.mycompany.fooddeliveryplatform.dto.menuItem.MenuItemRequestDto;
 import com.mycompany.fooddeliveryplatform.dto.menuItem.MenuItemResponseDto;
-import com.mycompany.fooddeliveryplatform.model.MenuItem;
-import com.mycompany.fooddeliveryplatform.model.Restaurant;
+import com.mycompany.fooddeliveryplatform.model.restaurant.MenuItem;
+import com.mycompany.fooddeliveryplatform.model.restaurant.Restaurant;
 
 public class MenuItemMapper {
 
