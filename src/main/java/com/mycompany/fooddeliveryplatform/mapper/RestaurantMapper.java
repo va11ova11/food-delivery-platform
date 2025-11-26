@@ -3,7 +3,7 @@ package com.mycompany.fooddeliveryplatform.mapper;
 import com.mycompany.fooddeliveryplatform.dto.menuItem.MenuItemResponseDto;
 import com.mycompany.fooddeliveryplatform.dto.restaurant.RestaurantRequestDto;
 import com.mycompany.fooddeliveryplatform.dto.restaurant.RestaurantResponseDto;
-import com.mycompany.fooddeliveryplatform.model.Restaurant;
+import com.mycompany.fooddeliveryplatform.model.restaurant.Restaurant;
 
 import java.util.List;
 

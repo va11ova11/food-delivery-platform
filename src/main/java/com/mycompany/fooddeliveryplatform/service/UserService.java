@@ -30,6 +30,7 @@ public class UserService implements UserDetailsService {
                 .password(passwordEncoder.encode(request.password()))
                 .fullName(request.fullName())
                 .role(Role.CUSTOMER)
+                .address(request.address())
                 .build();
 
         User saved = userRepository.save(user);
@@ -38,7 +39,8 @@ public class UserService implements UserDetailsService {
                 saved.getId(),
                 saved.getEmail(),
                 saved.getFullName(),
-                saved.getRole().name()
+                saved.getRole().name(),
+                saved.getAddress()
         );
     }
 
